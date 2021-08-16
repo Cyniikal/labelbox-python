@@ -18,6 +18,14 @@ following packages/modules:
   fetching.
 * `utils.py` contains utility functions.
 
+## Code Formatting
+You will need to format code for CI to pass
+```
+$ brew install yapf
+$ yapf tests -i --verbose --recursive --parallel --style "google"
+$ yapf labelbox -i --verbose --recursive --parallel --style "google"
+```
+
 ## Branches
 
 * All development happens in per-feature branches prefixed by contributor's

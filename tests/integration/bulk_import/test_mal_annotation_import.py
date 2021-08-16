@@ -3,12 +3,12 @@
 # implementation of project.upload_annotations that uses AnnotationImports rather than
 # BulkImportRequest. Once we have that, we should be calling this new implementation
 # rather than the old one.
-# 
-# 
-# 
-# 
-# 
-# 
+#
+#
+#
+#
+#
+#
 #  import uuid
 # import ndjson
 # import pytest
@@ -24,7 +24,6 @@
 
 # """
 
-
 # def test_create_from_url(configured_project):
 #     name = str(uuid.uuid4())
 #     url = "https://storage.googleapis.com/labelbox-public-bucket/predictions_test_v2.ndjson"
@@ -39,7 +38,6 @@
 #     assert annotation_import.status_file_url is None
 #     assert annotation_import.state == AnnotationImportState.RUNNING
 
-
 # def test_validate_file(client, configured_project):
 #     name = str(uuid.uuid4())
 #     url = "https://storage.googleapis.com/labelbox-public-bucket/predictions_test_v2.ndjson"
@@ -48,7 +46,6 @@
 #                                               annotations=url,
 #                                               validate=True)
 #         #Schema ids shouldn't match
-
 
 # def test_create_from_objects(configured_project, predictions):
 #     name = str(uuid.uuid4())
@@ -62,7 +59,6 @@
 #     assert annotation_import.status_file_url is None
 #     assert annotation_import.state == AnnotationImportState.RUNNING
 #     assert_file_content(annotation_import.input_file_url, predictions)
-
 
 # def test_create_from_local_file(tmp_path, predictions, configured_project):
 #     name = str(uuid.uuid4())
@@ -80,7 +76,6 @@
 #     assert annotation_import.status_file_url is None
 #     assert annotation_import.state == AnnotationImportState.RUNNING
 #     assert_file_content(annotation_import.input_file_url, predictions)
-
 
 # def test_get(client, configured_project):
 #     name = str(uuid.uuid4())
@@ -100,7 +95,6 @@
 #     assert annotation_import.status_file_url is None
 #     assert annotation_import.state == AnnotationImportState.RUNNING
 
-
 # def test_validate_ndjson(tmp_path, configured_project):
 #     file_name = f"broken.ndjson"
 #     file_path = tmp_path / file_name
@@ -110,7 +104,6 @@
 #     with pytest.raises(ValueError):
 #         configured_project.upload_annotations(name="name",
 #                                               annotations=str(file_path))
-
 
 # def test_validate_ndjson_uuid(tmp_path, configured_project, predictions):
 #     file_name = f"repeat_uuid.ndjson"
@@ -130,7 +123,6 @@
 #     with pytest.raises(UuidError):
 #         configured_project.upload_annotations(name="name",
 #                                               annotations=repeat_uuid)
-
 
 # @pytest.mark.slow
 # def test_wait_till_done(rectangle_inference, configured_project):
@@ -154,7 +146,6 @@
 #     assert annotation_import.statuses[0]['status'] == 'SUCCESS'
 #     assert annotation_import.statuses[0]['uuid'] == rectangle_inference[
 #         'uuid']
-
 
 # def assert_file_content(url: str, predictions):
 #     response = requests.get(url)

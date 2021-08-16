@@ -240,11 +240,10 @@ class MEAPredictionImport(AnnotationImport):
                                     parent_id=model_run_id,
                                     name=name,
                                     url=url)
-                                    
+
     @classmethod
-    def from_name(
-            cls, client: "labelbox.Client", model_run_id: str,
-            name: str) -> "MEAPredictionImport":
+    def from_name(cls, client: "labelbox.Client", model_run_id: str,
+                  name: str) -> "MEAPredictionImport":
 
         query_str = """query getModelErrorAnalysisPredictionImportPyApi($modelRunId : ID!, $name: String!) {
             modelErrorAnalysisPredictionImport(
@@ -256,8 +255,9 @@ class MEAPredictionImport(AnnotationImport):
             "name": name,
         }
         response = client.execute(query_str, params)
-        if response is None: 
-           raise labelbox.exceptions.ResourceNotFoundError(MEAPredictionImport, params)
+        if response is None:
+            raise labelbox.exceptions.ResourceNotFoundError(
+                MEAPredictionImport, params)
 
         return cls(client, response["modelErrorAnalysisPredictionImport"])
 
@@ -293,9 +293,8 @@ class MALPredictionImport(AnnotationImport):
                                     url=url)
 
     @classmethod
-    def from_name(
-            cls, client: "labelbox.Client", project_id: str,
-            name: str) -> "MALPredictionImport":
+    def from_name(cls, client: "labelbox.Client", project_id: str,
+                  name: str) -> "MALPredictionImport":
 
         query_str = """query getModelAssistedLabelingPredictionImportPyApi($projectId : ID!, $name: String!) {
             modelAssistedLabelingPredictionImport(
@@ -307,7 +306,8 @@ class MALPredictionImport(AnnotationImport):
             "name": name,
         }
         response = client.execute(query_str, params)
-        if response is None: 
-           raise labelbox.exceptions.ResourceNotFoundError(MALPredictionImport, params)
+        if response is None:
+            raise labelbox.exceptions.ResourceNotFoundError(
+                MALPredictionImport, params)
 
         return cls(client, response["modelAssistedLabelingPredictionImport"])
