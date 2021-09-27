@@ -85,6 +85,7 @@ class Client:
             'Authorization': 'Bearer %s' % api_key,
             'X-User-Agent': f'python-sdk {SDK_VERSION}'
         }
+        self.session = requests.Session()
 
     @retry.Retry(predicate=retry.if_exception_type(
         labelbox.exceptions.InternalServerError))
@@ -160,7 +161,7 @@ class Client:
                     'Authorization': self.headers['Authorization']
                 }
 
-            response = requests.post(**request)
+            response = self.session.post(**request)
             logger.debug("Response: %s", response.text)
         except requests.exceptions.Timeout as e:
             raise labelbox.exceptions.TimeoutError(str(e))
