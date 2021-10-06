@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+import uuid
 
 import pytest
 
@@ -238,3 +239,22 @@ def test_parse_raw_metadata(mdo):
     row = parsed[0]
     assert row.data_row_id == example["dataRowId"]
     assert len(row.fields) == 3
+
+
+def test_create_data_rows_with_metadata(dataset, image_url, mdo):
+    external_id = str(uuid.uuid4())
+    task = dataset.create_data_rows([
+        {
+            "row_data": image_url,
+            "external_id": external_id,
+            "metadata" : [
+                DataRowMetadataField(schema_id=TEXT_SCHEMA_ID,value="message")
+            ]
+        },
+    ])
+    task.wait_till_done()
+    data_row_id = dataset.data_row_for_external_id(external_id).uid
+    res = mdo.bulk_export([data_row_id])
+    breakpoint()
+
+

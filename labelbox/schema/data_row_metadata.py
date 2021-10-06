@@ -6,9 +6,11 @@ from typing import List, Optional, Dict, Union, Callable, Type, Any, Generator
 
 from pydantic import BaseModel, conlist, constr
 
-from labelbox.schema.ontology import SchemaId
 from labelbox.utils import camel_case
 
+
+FeatureSchemaId: Type[str] = constr(min_length=25, max_length=25)
+SchemaId: Type[str] = constr(min_length=25, max_length=25)
 
 class DataRowMetadataKind(Enum):
     datetime = "CustomMetadataDateTime"
@@ -471,3 +473,4 @@ def _validate_enum_parse(
         "schemaId": field.value,
         "value": {}
     }]
+

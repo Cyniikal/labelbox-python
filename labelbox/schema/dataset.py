@@ -1,18 +1,24 @@
-from labelbox.schema import iam_integration
-from labelbox import utils
+
+
 import os
 import json
 import logging
-from itertools import islice
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import ndjson
 from io import StringIO
+from itertools import islice
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 import requests
 
 from labelbox.exceptions import InvalidQueryError, LabelboxError, ResourceNotFoundError, InvalidAttributeError
 from labelbox.orm.db_object import DbObject, Updateable, Deletable
 from labelbox.orm.model import Entity, Field, Relationship
+from labelbox import utils
+
+
+from labelbox.schema.data_row_metadata import DataRowMetadataField
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +66,7 @@ class Dataset(DbObject, Updateable, Deletable):
             InvalidQueryError: If `DataRow.row_data` field value is not provided
                 in `kwargs`.
             InvalidAttributeError: in case the DB object type does not contain
-                any of the field names given in `kwargs`.
+                anxy of the field names given in `kwargs`.
 
         """
         DataRow = Entity.DataRow
@@ -177,7 +183,6 @@ class Dataset(DbObject, Updateable, Deletable):
         Finally the json data is uploaded to gcs and a uri is returned. This uri can be passed to
 
 
-
         Each element in `items` can be either a `str` or a `dict`. If
         it is a `str`, then it is interpreted as a local file path. The file
         is uploaded to Labelbox and a DataRow referencing it is created.
@@ -220,6 +225,7 @@ class Dataset(DbObject, Updateable, Deletable):
         file_upload_thread_count = 20
         DataRow = Entity.DataRow
         AssetAttachment = Entity.AssetAttachment
+        mdo = self.client.get_data_row_metadata_ontology()
 
         def upload_if_necessary(item):
             row_data = item['row_data']
@@ -250,6 +256,27 @@ class Dataset(DbObject, Updateable, Deletable):
                     )
             return attachments
 
+        def validate_and_format_metadata(item):
+            metadata = item.get('metadata')
+            if metadata:
+                new_metadata = []
+                if isinstance(metadata, list):
+                    for metadatum in metadata:
+                        if isinstance(metadatum, dict):
+                            # Validate ...
+                            mdo.parse_metadata(metadatum)
+                            new_metadata.append(metadatum)
+                        elif isinstance(metadatum, DataRowMetadataField):
+                            new_metadata.extend([field.dict(by_alias = True) for field in mdo._parse_upsert(metadatum)])
+                        else:
+                            raise TypeError("All metadata  should either be a `dict` or `DataRowMetadataField`.")
+                else:
+                    raise ValueError(
+                        f"metadata must be a list. Found {type(metadata)}"
+                    )
+                item['metadata'] = new_metadata
+            return item
+
         def format_row(item):
             # Formats user input into a consistent dict structure
             if isinstance(item, dict):
@@ -273,7 +300,7 @@ class Dataset(DbObject, Updateable, Deletable):
                     "`row_data` missing when creating DataRow.")
 
             invalid_keys = set(item) - {
-                *{f.name for f in DataRow.fields()}, 'attachments'
+                *{f.name for f in DataRow.fields()}, 'attachments', 'metadata'
             }
             if invalid_keys:
                 raise InvalidAttributeError(DataRow, invalid_keys)
@@ -290,6 +317,8 @@ class Dataset(DbObject, Updateable, Deletable):
             validate_keys(item)
             # Make sure attachments are valid
             validate_attachments(item)
+            # Make sure attachments are valid
+            item = validate_and_format_metadata(item)
             # Upload any local file paths
             item = upload_if_necessary(item)
 
