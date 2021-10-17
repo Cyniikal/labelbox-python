@@ -1,4 +1,5 @@
 from typing import Callable, Optional
+from urllib.parse import urlparse
 
 import requests
 from google.api_core import retry
@@ -14,6 +15,22 @@ class TextData(BaseData):
     file_path: Optional[str] = None
     text: Optional[str] = None
     url: Optional[str] = None
+
+    def from_data_row(cls, data_row):
+
+        result = urlparse(data_row.row_data)
+        if all([result.scheme, result.netloc]):
+            return TextData(
+                external_id=data_row.external_id,
+                uid=data_row.uid,
+                url=result.geturl()
+            )
+        else:
+            return TextData(
+                external_id=data_row.external_id,
+                uid=data_row.uid,
+                text=data_row.row_data
+            )
 
     @property
     def value(self) -> str:
@@ -86,10 +103,10 @@ class TextData(BaseData):
         return values
 
     def __repr__(self) -> str:
-        return  f"TextData(file_path={self.file_path}," \
-                f"text={self.text[:30] + '...' if self.text is not None else None}," \
-                f"url={self.url})"
+        return f"TextData(file_path={self.file_path}," \
+               f"text={self.text[:30] + '...' if self.text is not None else None}," \
+               f"url={self.url})"
 
-    class config:
+    class Config:
         # Required for discriminating between data types
         extra = 'forbid'

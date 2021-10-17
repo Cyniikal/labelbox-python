@@ -1,13 +1,14 @@
 from abc import ABC
 from io import BytesIO
 from typing import Callable, Optional, Union
-from typing_extensions import Literal
+
 import numpy as np
 import requests
 from PIL import Image
 from google.api_core import retry
 from pydantic import BaseModel
 from pydantic import root_validator
+from typing_extensions import Literal
 
 from .base_data import BaseData
 from ..types import TypedArray
@@ -207,4 +208,9 @@ class MaskData(RasterData):
 
 
 class ImageData(RasterData, BaseData):
-    ...
+    def from_data_row(cls, data_row):
+        return ImageData(
+            external_id=data_row.external_id,
+            uid=data_row.uid,
+            url=data_row.row_data,
+        )

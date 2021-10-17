@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from pydantic import BaseModel
@@ -11,3 +11,8 @@ class BaseData(BaseModel, ABC):
     """
     external_id: Optional[str] = None
     uid: Optional[str] = None
+
+    @classmethod
+    @abstractmethod
+    def from_data_row(cls, data_row):
+        pass

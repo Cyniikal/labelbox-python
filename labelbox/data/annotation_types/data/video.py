@@ -2,13 +2,13 @@ import logging
 import os
 import urllib.request
 from typing import Callable, Dict, Generator, Optional, Tuple
-from typing_extensions import Literal
 from uuid import uuid4
 
 import cv2
 import numpy as np
 from google.api_core import retry
 from pydantic import root_validator
+from typing_extensions import Literal
 
 from .base_data import BaseData
 from ..types import TypedArray
@@ -23,6 +23,13 @@ class VideoData(BaseData):
     file_path: Optional[str] = None
     url: Optional[str] = None
     frames: Optional[Dict[int, TypedArray[Literal['uint8']]]] = None
+
+    def from_data_row(cls, data_row):
+        return VideoData(
+            external_id=data_row.external_id,
+            uid=data_row.uid,
+            url=data_row.row_data,
+        )
 
     def load_frames(self, overwrite: bool = False) -> None:
         """
@@ -160,9 +167,9 @@ class VideoData(BaseData):
         return values
 
     def __repr__(self) -> str:
-        return  f"TextData(file_path={self.file_path}," \
-                f"frames={'...' if self.frames is not None else None}," \
-                f"url={self.url})"
+        return f"TextData(file_path={self.file_path}," \
+               f"frames={'...' if self.frames is not None else None}," \
+               f"url={self.url})"
 
     class Config:
         # Required for discriminating between data types
