@@ -247,7 +247,7 @@ def test_ntf_data_row_bulk_creation(dataset):
 
     # Test creation using URL
     task = dataset.create_data_rows([{
-        "tileLayerUrl": "https://storage.googleapis.com/jakub-test/025dec.NTF"
+        "tileLayerUrl": "https://storage.googleapis.com/jakub-test/U_1001A.NTF"
     }])
     assert task in client.get_user().created_tasks()
     # TODO make Tasks expandable
