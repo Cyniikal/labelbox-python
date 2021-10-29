@@ -69,9 +69,7 @@ def test_data_row_bulk_creation(dataset, rand_gen, image_url):
 def test_data_row_large_bulk_creation(dataset, image_url):
     # Do a longer task and expect it not to be complete immediately
 
-    task = dataset.create_data_rows([{
-        DataRow.row_data: image_url
-    }] * 500)
+    task = dataset.create_data_rows([{DataRow.row_data: image_url}] * 500)
     task.wait_till_done()
     assert task.status == "COMPLETE"
     assert len(list(dataset.data_rows())) == 500
@@ -182,7 +180,7 @@ def test_data_row_iteration(dataset, image_url) -> None:
 
 def test_data_row_attachments(dataset, image_url):
     attachments = [("IMAGE", image_url), ("TEXT", "test-text"),
-                   ("IMAGE_OVERLAY", image_url)] #, ("HTML", image_url)]
+                   ("IMAGE_OVERLAY", image_url)]  #, ("HTML", image_url)]
     task = dataset.create_data_rows([{
         "row_data": image_url,
         "external_id": "test-id",
@@ -213,7 +211,7 @@ def test_data_row_attachments(dataset, image_url):
 
 def test_create_data_rows_sync_attachments(dataset, image_url):
     attachments = [("IMAGE", image_url), ("TEXT", "test-text"),
-                   ("IMAGE_OVERLAY", image_url)] #, ("HTML", image_url)]
+                   ("IMAGE_OVERLAY", image_url)]  #, ("HTML", image_url)]
     attachments_per_data_row = 3
     dataset.create_data_rows_sync([{
         "row_data":
@@ -241,3 +239,19 @@ def test_create_data_rows_sync_mixed_upload(dataset, image_url):
             DataRow.row_data: image_url
         }] * n_urls + [fp.name] * n_local)
     assert len(list(dataset.data_rows())) == n_local + n_urls
+
+
+def test_ntf_data_row_bulk_creation(dataset):
+    client = dataset.client
+    assert len(list(dataset.data_rows())) == 0
+
+    # Test creation using URL
+    task = dataset.create_data_rows([{
+        "tileLayerUrl": "https://storage.googleapis.com/jakub-test/025dec.NTF"
+    }])
+    assert task in client.get_user().created_tasks()
+    # TODO make Tasks expandable
+    with pytest.raises(InvalidQueryError):
+        assert task.created_by() == client.get_user()
+    task.wait_till_done()
+    assert task.status == "COMPLETE"
