@@ -1,6 +1,6 @@
 FROM python:3.7
 
-RUN pip install pytest pytest-cases
+RUN pip install pytest-cases "pytest< 7.0.0" 
 RUN apt-get -y update
 RUN apt install -y libsm6 \
                 libxext6 \
